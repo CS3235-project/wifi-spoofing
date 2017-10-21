@@ -4,23 +4,45 @@
 #given some preferred essid and MAC, if another MAC with the same SSID exists
 #a notification warns the user
 
-MAC="58:2A:F7:9E:45:5A"
-essid="HUAWEI"
 while true; do
-	count=0
-	array=( $(sudo iwlist wlp4s0 scan | grep 'Address\|ESSID:' | grep -B 1 "\"${essid}\"") )
-	for i in "${array[@]}"
-	do
-		if [ $(($count%7)) -eq 4 ]
-		then
-			#echo "${i}"
-			if [ "$MAC" != "$i" ]
-				then
-				notify-send "Warning, "${essid}" wifi may be compromised"
-				echo "Warning, unexpeced MAC : ${i}"
-			fi
-		fi
-		((++count))
+	mapfile -t myArray < authorised.list
+	index=1
+	for j in `seq 0 $((${myArray[0]}-1))`; do
+		echo "j is $j"
+		count=0
+		SSID=${myArray[index]}
+		((++index))
+		nbAuthorisedMacs=${myArray[index]}
+		echo "Nb authorised macs is $nbAuthorisedMacs"
+		((++index))
+		echo "SSID is $SSID"
+		array=( $(sudo iwlist wlp4s0 scan | grep 'Address\|ESSID:' | grep -B 1 "\"${SSID}\"") )
+		for i in "${array[@]}"
+		do
+			#echo "$i"
+			if [ $(($count%7)) -eq 4 ]
+			then
+				#echo "${i}"
+				problem="YES"
+				for k in `seq $index $(($index+$nbAuthorisedMacs-1))`; do
+					
+					if [ ${myArray[k]} == "$i" ]
+						then
+						problem="NO"
+						fi
+				done
+				if [ "$problem" != "NO" ]
+					then
+						if [ ${i} != "ESSID:"$SSID"" ]
+							then
+							notify-send "Warning, wifi may be compromised"
+							echo "Warning, unexpeced MAC : ${i}"
+						fi				
+				fi
+			fi	
+			((++count))
+		done
+		index=$(($index+$nbAuthorisedMacs))
 	done
 	sleep 30s
 done
