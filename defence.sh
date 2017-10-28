@@ -13,17 +13,25 @@ do
 		count=0
 		SSID=${myArray[index]}
 		((++index))
-		connectedSSID=$(iwgetid -r)	
+		connectedSSID=$(iwgetid -r)
+		array=( $(iwlist wlp4s0 scan | grep Address ) )
+		connectedMAC=${array[4]}	
 		nbAuthorisedMacs=${myArray[index]}
 		((++index))
 		if [ "$SSID" == "$connectedSSID" ]
 		then
 			array=( $(sudo iwlist wlp4s0 scan | grep 'Address\|ESSID:' | grep -B 1 "\"${SSID}\"") )
+			sameMac=0
 			for i in "${array[@]}"
 			do
 				if [ $((count%7)) -eq 4 ]
 				then
 					#echo "${i}"
+					echo "${connectedMAC}"
+					if [ "${connectedMAC}" == "$i" ]
+					then
+						((++sameMac))
+					fi
 					problem="YES"
 					for k in $(seq $index $((index+nbAuthorisedMacs-1)))
 				        do
@@ -40,6 +48,11 @@ do
 				fi	
 				((++count))
 			done
+			if [ "$sameMac" != "1" ]
+			then
+				notify-send "Warning, wifi ${SSID} may be compromised"
+				echo "Warning, there are ${sameMac} AP with identical MAC"				
+			fi
 		fi
 		index=$((index+nbAuthorisedMacs))
 	done
