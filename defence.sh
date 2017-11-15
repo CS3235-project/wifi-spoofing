@@ -13,9 +13,11 @@ do
 		count=0
 		SSID=${myArray[index]}
 		((++index))
-		connectedSSID=$(iwgetid -r)
-		array=( $(iwlist wlp4s0 scan | grep Address ) )
-		connectedMAC=${array[4]}	
+		#connectedSSID=$(iwgetid -r)
+		connectedSSID="testnet"
+		#array=( $(iwlist wlp4s0 scan | grep Address ) )
+		#connectedMAC=${array[4]}
+		connectedMAC="D4:6E:0E:59:D3:E4"
 		nbAuthorisedMacs=${myArray[index]}
 		((++index))
 		if [ "$SSID" == "$connectedSSID" ]
@@ -27,7 +29,7 @@ do
 				if [ $((count%7)) -eq 4 ]
 				then
 					#echo "${i}"
-					echo "${connectedMAC}"
+					#echo "${connectedMAC}"
 					if [ "${connectedMAC}" == "$i" ]
 					then
 						((++sameMac))
@@ -56,5 +58,4 @@ do
 		fi
 		index=$((index+nbAuthorisedMacs))
 	done
-	sleep 30s
 done
