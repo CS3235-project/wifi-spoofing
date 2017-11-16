@@ -4,6 +4,8 @@
 #given some preferred essid and MAC, if another MAC with the same SSID exists
 #a notification warns the user
 
+echo "Enter scanning interface"
+read interface
 mapfile -t myArray < authorised.list
 while true
 do
@@ -13,16 +15,14 @@ do
 		count=0
 		SSID=${myArray[index]}
 		((++index))
-		#connectedSSID=$(iwgetid -r)
-		connectedSSID="testnet"
-		#array=( $(iwlist wlp4s0 scan | grep Address ) )
-		#connectedMAC=${array[4]}
-		connectedMAC="D4:6E:0E:59:D3:E4"
+		connectedSSID=$(iwgetid -r)
+		array=( $(iwlist ${interface} scan | grep Address ) )
+		connectedMAC=${array[4]}
 		nbAuthorisedMacs=${myArray[index]}
 		((++index))
 		if [ "$SSID" == "$connectedSSID" ]
 		then
-			array=( $(sudo iwlist wlp4s0 scan | grep 'Address\|ESSID:' | grep -B 1 "\"${SSID}\"") )
+			array=( $(sudo iwlist ${interface} scan | grep 'Address\|ESSID:' | grep -B 1 "\"${SSID}\"") )
 			sameMac=0
 			for i in "${array[@]}"
 			do
